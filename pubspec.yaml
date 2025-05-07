@@ -1,5 +1,5 @@
 name: mascotas_app_nueva
-description: "A new Flutter project."
+description: "Aplicación para gestión de mascotas con Firebase"
 
 publish_to: 'none'
 
@@ -12,16 +12,41 @@ dependencies:
   flutter:
     sdk: flutter
 
+  # Paquetes básicos
   cupertino_icons: ^1.0.8
-  firebase_core: ^3.13.0  # Última versión estable
-  firebase_auth: ^5.0.0  # Última versión estable
-  cloud_firestore: ^5.6.7 # Última versión estable
+
+  # Firebase Core
+  firebase_core: ^3.13.0
+
+  # Autenticación
+  firebase_auth: ^5.0.0
+  google_sign_in: ^6.1.0  # Para autenticación con Google
+
+  # Base de datos
+  cloud_firestore: ^5.6.7
+
+  # Futuras implementaciones (ya las tenemos en vista)
+  fluttertoast: ^8.2.2  # Para notificaciones toast
+  provider: ^6.0.5     # Para gestión de estado
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
   flutter_lints: ^5.0.0
 
 flutter:
   uses-material-design: true
+  
+  # Configuración de assets
+  assets:
+    - assets/images/google_logo.png
+    - assets/images/app_logo.png  
+    - assets/images/fondo_mascotas.jpg
+    
+  # Opcional: Fuentes personalizadas (si las necesitaras)
+  fonts:
+    - family: Poppins
+      fonts:
+        - asset: assets/fonts/Poppins-Regular.ttf
+        - asset: assets/fonts/Poppins-Bold.ttf
+          weight: 700
