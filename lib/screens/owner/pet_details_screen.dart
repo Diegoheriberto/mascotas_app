@@ -126,20 +126,18 @@ class PetDetailsScreen extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-        ...(petData['vaccines'] as List)
-            .map(
-              (vaccine) => Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4),
-                child: Row(
-                  children: [
-                    const Icon(Icons.medical_services, size: 20),
-                    const SizedBox(width: 8),
-                    Text(vaccine.toString()),
-                  ],
-                ),
-              ),
-            )
-            .toList(),
+        ...(petData['vaccines'] as List).map(
+          (vaccine) => Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            child: Row(
+              children: [
+                const Icon(Icons.medical_services, size: 20),
+                const SizedBox(width: 8),
+                Text(vaccine.toString()),
+              ],
+            ),
+          ),
+        ),
       ],
     );
   }

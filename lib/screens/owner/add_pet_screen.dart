@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart'; // <-- Import añadido
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:image_picker_web/image_picker_web.dart';
+import 'dart:typed_data';
 
 class AddPetScreen extends StatefulWidget {
   const AddPetScreen({super.key});
@@ -17,51 +20,30 @@ class _AddPetScreenState extends State<AddPetScreen> {
   final TextEditingController _breedController = TextEditingController();
   DateTime? _birthDate;
   String? _selectedGender;
+  Uint8List? _petImage;
 
   final List<String> _petTypes = ['Perro', 'Gato', 'Conejo', 'Ave', 'Otro'];
   final List<String> _genders = ['Macho', 'Hembra'];
 
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _typeController.dispose();
-    _breedController.dispose();
-    super.dispose();
+  Future<void> _pickImage() async {
+    final image = await ImagePickerWeb.getImageAsBytes();
+    if (image != null) {
+      setState(() {
+        _petImage = image;
+      });
+    }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Añadir Mascota'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.save),
-            onPressed: _savePet,
-            tooltip: 'Guardar mascota',
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildNameField(),
-              const SizedBox(height: 20),
-              _buildTypeDropdown(),
-              const SizedBox(height: 20),
-              _buildBreedField(),
-              const SizedBox(height: 20),
-              _buildBirthDatePicker(),
-              const SizedBox(height: 20),
-              _buildGenderRadio(),
-              const SizedBox(height: 30),
-              _buildSaveButton(),
-            ],
-          ),
+  // Añade este método que falta
+  Widget _buildSaveButton() {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton.icon(
+        icon: const Icon(Icons.save),
+        label: const Text('Guardar Mascota'),
+        onPressed: _savePet,
+        style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
         ),
       ),
     );
@@ -175,20 +157,6 @@ class _AddPetScreenState extends State<AddPetScreen> {
     );
   }
 
-  Widget _buildSaveButton() {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton.icon(
-        icon: const Icon(Icons.save),
-        label: const Text('Guardar Mascota'),
-        style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-        ),
-        onPressed: _savePet,
-      ),
-    );
-  }
-
   Future<void> _selectDate() async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -212,6 +180,15 @@ class _AddPetScreenState extends State<AddPetScreen> {
       }
 
       try {
+        String? imageUrl;
+        if (_petImage != null) {
+          final ref = FirebaseStorage.instance.ref().child(
+            'pet_images/${DateTime.now().millisecondsSinceEpoch}.jpg',
+          );
+          await ref.putData(_petImage!);
+          imageUrl = await ref.getDownloadURL();
+        }
+
         await FirebaseFirestore.instance.collection('pets').add({
           'name': _nameController.text,
           'type': _typeController.text,
@@ -219,15 +196,84 @@ class _AddPetScreenState extends State<AddPetScreen> {
               _breedController.text.isNotEmpty ? _breedController.text : null,
           'birthDate': _birthDate,
           'gender': _selectedGender,
+          'imageUrl': imageUrl,
           'ownerId': user.uid,
           'createdAt': FieldValue.serverTimestamp(),
         });
 
         Fluttertoast.showToast(msg: "Mascota guardada exitosamente");
-        Navigator.pop(context);
+        if (mounted) Navigator.pop(context);
       } catch (e) {
         Fluttertoast.showToast(msg: "Error al guardar: ${e.toString()}");
       }
     }
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _typeController.dispose();
+    _breedController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Añadir Mascota'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.save),
+            onPressed: _savePet,
+            tooltip: 'Guardar mascota',
+          ),
+        ],
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Column(
+                  children: [
+                    CircleAvatar(
+                      radius: 60,
+                      backgroundImage:
+                          _petImage != null
+                              ? MemoryImage(_petImage!)
+                              : const AssetImage(
+                                    'assets/images/default_pet.png',
+                                  )
+                                  as ImageProvider,
+                    ),
+                    TextButton.icon(
+                      icon: const Icon(Icons.camera_alt),
+                      label: const Text('Añadir foto'),
+                      onPressed: _pickImage,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              _buildNameField(),
+              const SizedBox(height: 20),
+              _buildTypeDropdown(),
+              const SizedBox(height: 20),
+              _buildBreedField(),
+              const SizedBox(height: 20),
+              _buildBirthDatePicker(),
+              const SizedBox(height: 20),
+              _buildGenderRadio(),
+              const SizedBox(height: 30),
+              _buildSaveButton(), // Ahora este método está definido
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
