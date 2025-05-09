@@ -12,9 +12,13 @@ dependencies:
   flutter:
     sdk: flutter
 
-  intl: ^0.18.1
+  intl: ^0.20.2
 
   line_icons: ^2.0.1
+
+  image_picker: ^1.0.4
+  firebase_storage: 12.4.5
+  cached_network_image: ^3.3.0
 
   # Paquetes básicos
   cupertino_icons: ^1.0.8
