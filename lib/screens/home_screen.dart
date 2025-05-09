@@ -10,7 +10,7 @@ class HomeScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mi App de Mascotas'),
+        title: const Text('Mis Mascotas'),
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
@@ -47,9 +47,9 @@ class HomeScreen extends StatelessWidget {
             const SizedBox(height: 30),
             ElevatedButton.icon(
               icon: const Icon(Icons.pets),
-              label: const Text('Mis Mascotas'),
+              label: const Text('Mis mascotas'),
               onPressed: () {
-                // Navegar a lista de mascotas
+                Navigator.pushNamed(context, '/my-pets'); // Agrega esta línea
               },
             ),
           ],

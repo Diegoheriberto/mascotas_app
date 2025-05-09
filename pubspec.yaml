@@ -12,6 +12,10 @@ dependencies:
   flutter:
     sdk: flutter
 
+  intl: ^0.18.1
+
+  line_icons: ^2.0.1
+
   # Paquetes básicos
   cupertino_icons: ^1.0.8
 
@@ -41,7 +45,7 @@ flutter:
   assets:
     - assets/images/google_logo.png
     - assets/images/app_logo.png  
-    - assets/images/fondo_mascotas.jpg
+    - assets/images/pet_background.jpg
     
   # Opcional: Fuentes personalizadas (si las necesitaras)
   fonts:
